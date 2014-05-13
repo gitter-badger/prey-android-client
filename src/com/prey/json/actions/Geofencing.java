@@ -14,18 +14,23 @@ import org.json.JSONObject;
  
  
  
+
+
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
- 
+
+import com.google.android.gms.location.Geofence;
 import com.prey.PreyConfig;
 import com.prey.PreyLogger;
- 
 import com.prey.actions.HttpDataService;
 import com.prey.actions.geo.ProxAlertActivity;
 import com.prey.actions.observer.ActionResult;
  
  
+import com.prey.geofences.GeofencingService;
+import com.prey.geofences.PreyGeofence;
 import com.prey.json.JsonAction;
 import com.prey.json.UtilJson;
 import com.prey.net.PreyWebServices;
@@ -33,8 +38,25 @@ import com.prey.net.PreyWebServices;
 public class Geofencing extends JsonAction{
 
  
+	public void start(Context ctx, List<ActionResult> lista, JSONObject parameters) {	
+		double latitude = Double.parseDouble("-32.7521");
+		double longitude = Double.parseDouble("-70.7193");
+		float radius = Float.parseFloat("100");
 
-	public void start(Context ctx, List<ActionResult> lista, JSONObject parameters) {
+		int transitionType = Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT;
+		int mId = 0;
+
+		PreyGeofence myGeofence = new PreyGeofence(mId, latitude, longitude, radius, transitionType);
+
+		Intent geofencingService = new Intent(ctx, GeofencingService.class);
+
+		geofencingService.putExtra(GeofencingService.EXTRA_ACTION, GeofencingService.Action.ADD);
+		geofencingService.putExtra(GeofencingService.EXTRA_GEOFENCE, myGeofence);
+
+		ctx.startService(geofencingService);
+	}
+
+	public void start2(Context ctx, List<ActionResult> lista, JSONObject parameters) {
 		
 		try {
 			PreyConfig preyConfig = PreyConfig.getPreyConfig(ctx);
